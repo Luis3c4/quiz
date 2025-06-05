@@ -1,72 +1,11 @@
-import { useState } from "react";
-import "./app.css";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@radix-ui/react-label";
+import Quiz from "@/components/quiz"
 
-const questions = [
-  {
-    id: 1,
-    question: "¿Cuál es la capital de Francia?",
-    options: [
-      { id: "a", text: "Paris" },
-      { id: "b", text: "Londres" },
-      { id: "c", text: "Berlín" },
-      { id: "d", text: "Madrid" },
-    ],
-    correctAnswer: "b"
-  },
-];
-
-function App() {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedOption, setSelectedOption] = useState("");
-  const [answered, setAnswered] = useState(false);
-  const currentQ = questions[currentQuestion];
-
+export default function App() {
   return (
-    <Card className="w-full max-w-xl mx-auto mt-10">
-      <CardHeader>
-        <CardTitle className="text-2xl">
-          Pregunta {currentQuestion + 1}
-        </CardTitle>
-        <CardDescription>seleciona la respuesta correcta</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="text-xl font-medium ">{currentQ.question}</div>
-          <RadioGroup
-            value={selectedOption}
-            onValueChange={setSelectedOption}
-            className="space-y-2"
-            disabled={answered}
-          >
-            {currentQ.options.map((option) => (
-              <div key={option.id} className= {`flex items-center space-x-2 rounded-lg border p-4 transition-colors
-                ${!answered && selectedOption === option.id ? "bg-gray-100": ""}
-              `}>
-                <RadioGroupItem value={option.id} id={`option-${option.id}`} />
-                <Label htmlFor={`option-${option.id}`} className="cursor-pointer">
-                  {option.text}
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
-        </div>
-      </CardContent>
-      <CardFooter>
-        <p className="text-sm text-muted-foreground">selecionaste: <strong>{selectedOption || "ninguna"}</strong></p>
-      </CardFooter>
-    </Card>
-  );
+    <main className="flex min-h-screen flex-col items-center justify-center p-4  bg-gray-50">
+      <div className="w-full max-w-2xl">
+        <Quiz />
+      </div>
+    </main>
+  )
 }
-[];
-export default App;

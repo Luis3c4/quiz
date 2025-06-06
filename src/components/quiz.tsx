@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../app.css";
 import {
   Card,
@@ -12,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@radix-ui/react-label";
 import { CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 
 const questions = [
   {
@@ -23,7 +24,7 @@ const questions = [
       { id: "c", text: "Berlín" },
       { id: "d", text: "Madrid" },
     ],
-    correctAnswer: "b",
+    correctAnswer: "a",
   },
   {
     id: 2,
@@ -55,7 +56,29 @@ function Quiz() {
   const [answered, setAnswered] = useState(false);
   const [finished, setFinished] = useState(false);
   const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeaft] = useState(15);
+  const [timeExpired, setTimeExpired] = useState(false);
+  const timeQ = 15; // tiempo para cada pregunta
   const currentQ = questions[currentQuestion];
+
+  useEffect(() => {
+    if (answered || finished)
+      return console.log("ya respondio o finalizo el quiz");
+    const timer = setInterval(() => {
+      setTimeLeaft((prev) => {
+        if (prev <= 1) {
+          setTimeExpired(true);
+          clearInterval(timer);
+          setAnswered(true);
+          setSelectedOption(currentQ.correctAnswer);
+          return 0;
+        }
+        console.log(prev);
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [answered, currentQuestion, finished]);
 
   const handleSubmit = () => {
     if (!selectedOption) return;
@@ -70,11 +93,14 @@ function Quiz() {
       setCurrentQuestion(next);
       setAnswered(false);
       setSelectedOption("");
+      setTimeExpired(false); // Reiniciar el estado de tiempo agotado
+      setTimeLeaft(timeQ); // Reiniciar el tiempo para la siguiente pregunta
     } else {
       setFinished(true);
     }
   };
   const handleRestart = () => {
+    setTimeLeaft(timeQ);
     setCurrentQuestion(0);
     setSelectedOption("");
     setAnswered(false);
@@ -111,10 +137,36 @@ function Quiz() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-2xl">
-          Pregunta {currentQuestion + 1}
-        </CardTitle>
+        <div className="flex items-center justify-between ">
+          <CardTitle className="text-2xl">
+            Pregunta {currentQuestion + 1}
+          </CardTitle>
+          <span className="text-sm text-muted-foreground">
+            {currentQuestion + 1} de {questions.length}
+          </span>
+        </div>
         <CardDescription>seleciona la respuesta correcta</CardDescription>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">tiempo restante</span>
+            <span className={`text-sm font-bold ${
+                timeLeft <= 5 ? "text-red-500" : "text-gray-600"
+              }`}
+            >
+              {timeLeft}s
+            </span>
+          </div>
+          <Progress
+            value={(timeLeft / timeQ) * 100}
+            className={`h-2 ${timeLeft <= 5 ? "bg-red-100" : ""}`}
+          />
+          {timeExpired && (
+            <div className="text-red-500 text-sm bg-red-50 p-2 rounded">
+              ⏰Tiempo agotado. Se ha seleccionado la respuesta correcta
+              automáticamente.
+            </div>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">

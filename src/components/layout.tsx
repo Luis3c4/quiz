@@ -1,5 +1,4 @@
 import Header from "./header";
-import Modulos from "./modulos";
 import NavH from "./navH";
 import Navleaf from "./navleft";
 import {Outlet} from "react-router-dom"

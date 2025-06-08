@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import "../app.css";
 import {
   Card,
   CardContent,
@@ -13,44 +12,20 @@ import { Label } from "@radix-ui/react-label";
 import { CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { QUIZ_CONFIG } from  "@/constans/timeQuiz"; 
 
-const questions = [
-  {
-    id: 1,
-    question: "¿Cuál es la capital de Francia?",
-    options: [
-      { id: "a", text: "Paris" },
-      { id: "b", text: "Londres" },
-      { id: "c", text: "Berlín" },
-      { id: "d", text: "Madrid" },
-    ],
-    correctAnswer: "a",
-  },
-  {
-    id: 2,
-    question: "¿En qué año comenzó la Segunda Guerra Mundial?",
-    options: [
-      { id: "a", text: "1939" },
-      { id: "b", text: "1941" },
-      { id: "c", text: "1945" },
-      { id: "d", text: "1938" },
-    ],
-    correctAnswer: "a",
-  },
-  {
-    id: 3,
-    question: "¿Cuál es el planeta más grande del sistema solar?",
-    options: [
-      { id: "a", text: "Tierra" },
-      { id: "b", text: "Marte" },
-      { id: "c", text: "Júpiter" },
-      { id: "d", text: "Saturno" },
-    ],
-    correctAnswer: "c",
-  },
-];
+interface Questions{
+  id: number;
+  question: string;
+  options: { id: string; text: string }[];
+  correctAnswer: string;
+}
 
-function Quiz() {
+interface QuizProps{
+  questions: Questions[],
+}
+
+function Quiz({questions}: QuizProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState("");
   const [answered, setAnswered] = useState(false);
@@ -58,7 +33,6 @@ function Quiz() {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeaft] = useState(15);
   const [timeExpired, setTimeExpired] = useState(false);
-  const timeQ = 15; // tiempo para cada pregunta
   const currentQ = questions[currentQuestion];
 
   useEffect(() => {
@@ -94,13 +68,13 @@ function Quiz() {
       setAnswered(false);
       setSelectedOption("");
       setTimeExpired(false); // Reiniciar el estado de tiempo agotado
-      setTimeLeaft(timeQ); // Reiniciar el tiempo para la siguiente pregunta
+      setTimeLeaft(QUIZ_CONFIG.TIME_PER_QUESTION); // Reiniciar el tiempo para la siguiente pregunta
     } else {
       setFinished(true);
     }
   };
   const handleRestart = () => {
-    setTimeLeaft(timeQ);
+    setTimeLeaft(QUIZ_CONFIG.TIME_PER_QUESTION);
     setCurrentQuestion(0);
     setSelectedOption("");
     setAnswered(false);
@@ -157,7 +131,7 @@ function Quiz() {
             </span>
           </div>
           <Progress
-            value={(timeLeft / timeQ) * 100}
+            value={(timeLeft / QUIZ_CONFIG.TIME_PER_QUESTION) * 100}
             className={`h-2 ${timeLeft <= 5 ? "bg-red-100" : ""}`}
           />
           {timeExpired && (

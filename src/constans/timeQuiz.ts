@@ -1,0 +1,4 @@
+export const QUIZ_CONFIG = {
+  TIME_PER_QUESTION: 15,
+  WARNING_TIME_THRESHOLD: 5,
+};

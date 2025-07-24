@@ -9,7 +9,7 @@ import Desafios from "./components/desafios";
 
 export default function App() {
   return (
-    <div className="min-h-scr  een bg-blue-50">
+    <div className="min-h-screen bg-blue-50">
       <Routes>
         <Route path="/" element={<Navigate to="/modulos" replace />} />
         <Route path="/" element={<Layout />}>

@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import client from "../db/tursoClient";
+import { RankingSchema, UsuarioSchema } from "./schemas/schemas";
 interface Usuario {
   usuario: string;
   puntos: number;
@@ -31,6 +32,7 @@ interface DatosUsuario {
   progress: number;
   logros: string[];
 }
+
 function Header() {
   const [datosUsuario, setDatosUsuario] = useState<DatosUsuario>({
     nombre: "",
@@ -40,19 +42,16 @@ function Header() {
   });
   const [rankingUsuarios, setRankingUsuarios] = useState<Usuario[]>([]);
 
+  
+
   useEffect(() => {
     const obtenerRanking = async () => {
       try {
         const res = await client.execute(
           "SELECT usuario, puntos FROM ranking ORDER BY puntos DESC LIMIT 10"
         );
-
-        const ranking = res.rows.map((row: any) => ({
-          usuario: row.usuario,
-          puntos: row.puntos,
-        }));
-        console.log("RANKING", ranking);
-        setRankingUsuarios(ranking);
+        const parsed = res.rows.map((row)=> RankingSchema.parse(row));
+        setRankingUsuarios(parsed);
       } catch (error) {
         console.error("Error al obtener datos del RANKING:", error);
       }
@@ -68,8 +67,11 @@ function Header() {
           "SELECT usuario, puntos FROM ranking WHERE id = ?",
           ["u005"]
         );
-        const usuario = res.rows[0] as unknown as Usuario;
-        if (usuario) {
+        const parsed =  UsuarioSchema.safeParse(res.rows[0]);
+        if (!parsed.success) {
+          console.log("ERROR DATOS USUARIO PARSED", parsed.error);
+        } else {
+          const usuario = parsed.data;
           setDatosUsuario({
             nombre: usuario.usuario,
             puntos: usuario.puntos,
@@ -162,7 +164,7 @@ function Header() {
                           </span>
                           <span>{usuario.puntos} puntos</span>
                         </div>
-                        <Progress value={80} className="h-2 mb-2 " />
+                        <Progress value={Math.round((usuario.puntos / 100) * 100)} className="h-2 mb-2 " />
                       </div>
                     ))}
 
